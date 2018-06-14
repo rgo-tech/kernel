@@ -1408,6 +1408,13 @@ int pltfrm_camera_module_set_pm_state(
 			PLTFRM_CAMERA_MODULE_PIN_PWR,
 			PLTFRM_CAMERA_MODULE_PIN_STATE_ACTIVE);
 
+		//hack: utilizing an unused "TORCH" GPIO to activate CIF_PWR.
+		//TODO: add dedicated dts mapping
+		pltfrm_camera_module_set_pin_state(
+			sd,
+			PLTFRM_CAMERA_MODULE_PIN_TORCH,
+			PLTFRM_CAMERA_MODULE_PIN_STATE_ACTIVE);
+
 		pltfrm_camera_module_set_pin_state(
 			sd,
 			PLTFRM_CAMERA_MODULE_PIN_RESET,
