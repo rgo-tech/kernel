@@ -98,6 +98,7 @@ static struct ov_camera_module_custom_config ov13850_custom_config;
 /* ======================================================================== */
 
 #ifndef OV13850_ONE_LANE
+#warning "ASSAF: !!!!OV13850_TWO_LANE !!!!"
 #ifdef OV13850_SENSOR_R1A
 /* MCLK:24MHz  4224x3136  7fps   mipi 2lane    600 Mbps/  2lane */
 static struct ov_camera_module_reg
@@ -1336,6 +1337,7 @@ static struct ov_camera_module_config ov13850_configs[] = {
 	}
 };
 #else
+#warning "ASSAF: !!!!OV13850_ONE_LANE !!!!"
 static struct ov_camera_module_config ov13850_onelane_configs[] = {
 	{
 		.name = "2112x1568_15fps",
