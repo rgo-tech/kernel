@@ -367,7 +367,7 @@ err:
 	return ret;
 }
 
-static int ov7750_auto_adjust_fps(struct ov_camera_module *cam_mod,
+/*static int ov7750_auto_adjust_fps(struct ov_camera_module *cam_mod,
 	u32 exp_time)
 {
 	int ret;
@@ -396,7 +396,7 @@ static int ov7750_auto_adjust_fps(struct ov_camera_module *cam_mod,
 	}
 
 	return ret;
-}
+}*/
 
 static int ov7750_write_aec(struct ov_camera_module *cam_mod)
 {
@@ -419,21 +419,68 @@ static int ov7750_write_aec(struct ov_camera_module *cam_mod)
 		u32 exp_time;
 
 		a_gain = a_gain > 0x7ff ? 0x7ff : a_gain;
-		a_gain = a_gain * cam_mod->exp_config.gain_percent / 100;
+		a_gain = a_gain < 0x10 ? 0x10 : a_gain;
+		//a_gain = a_gain * cam_mod->exp_config.gain_percent / 100;
 		exp_time = cam_mod->exp_config.exp_time << 4;
 		if (cam_mod->state == OV_CAMERA_MODULE_STREAMING)
-			ret = ov_camera_module_write_reg(cam_mod,
-				ov7750_AEC_GROUP_UPDATE_ADDRESS,
-				ov7750_AEC_GROUP_UPDATE_START_DATA);
+//			ret = ov_camera_module_write_reg(cam_mod,
+//				ov7750_AEC_GROUP_UPDATE_ADDRESS,
+//				ov7750_AEC_GROUP_UPDATE_START_DATA);
 		if (!IS_ERR_VALUE(ret) && cam_mod->auto_adjust_fps)
-			ret = ov7750_auto_adjust_fps(cam_mod,
-						cam_mod->exp_config.exp_time);
-		ret |= ov_camera_module_write_reg(cam_mod,
-			ov7750_AEC_PK_LONG_GAIN_HIGH_REG,
-			ov7750_FETCH_MSB_GAIN(a_gain));
-		ret |= ov_camera_module_write_reg(cam_mod,
-			ov7750_AEC_PK_LONG_GAIN_LOW_REG,
-			ov7750_FETCH_LSB_GAIN(a_gain));
+//			ret = ov7750_auto_adjust_fps(cam_mod,
+//						cam_mod->exp_config.exp_time);
+//		ret |= ov_camera_module_write_reg(cam_mod,
+//			ov7750_AEC_PK_LONG_GAIN_HIGH_REG,
+//			ov7750_FETCH_MSB_GAIN(a_gain));
+//		ret |= ov_camera_module_write_reg(cam_mod,
+//			ov7750_AEC_PK_LONG_GAIN_LOW_REG,
+//			ov7750_FETCH_LSB_GAIN(a_gain));
+
+
+		if (0){
+			u32 t3500, t3501, t3502, t350b, t3503, t320d;
+
+			ov_camera_module_read_reg(cam_mod,1,0x3500,&t3500);
+			ov_camera_module_read_reg(cam_mod,1,0x3501,&t3501);
+			ov_camera_module_read_reg(cam_mod,1,0x3502,&t3502);
+			ov_camera_module_read_reg(cam_mod,1,0x3503,&t3503);
+			ov_camera_module_read_reg(cam_mod,1,0x350b,&t350b);
+
+			ov_camera_module_read_reg(cam_mod,1,0x320d,&t320d);
+			
+			printk("ASSAF3: READ: 3500=%x, 3501=%x, 3502=%x, 3503=%x, 350b=%x, 320d=%x\n", t3500, t3501,t3502,t3503,t350b,t320d);
+
+			printk("ASSAF3: GAIN: %x=%x, %x=%x\n",
+				ov7750_AEC_PK_LONG_GAIN_HIGH_REG, ov7750_FETCH_MSB_GAIN(a_gain),
+				ov7750_AEC_PK_LONG_GAIN_LOW_REG, ov7750_FETCH_LSB_GAIN(a_gain)		
+			);
+
+			printk("ASSAF3: EXP: %x=%x, %x=%x, %x=%x\n",
+				ov7750_AEC_PK_LONG_EXPO_3RD_REG, ov7750_FETCH_3RD_BYTE_EXP(exp_time),
+				ov7750_AEC_PK_LONG_EXPO_2ND_REG, ov7750_FETCH_2ND_BYTE_EXP(exp_time),
+				ov7750_AEC_PK_LONG_EXPO_1ST_REG, ov7750_FETCH_1ST_BYTE_EXP(exp_time)
+			);
+		}
+
+
+
+//		ret |= ov_camera_module_write_reg(cam_mod,
+//			0x3503,
+//			0x03);
+
+//		ret |= ov_camera_module_write_reg(cam_mod,
+//			0x380c,
+//			0x03);
+//		ret |= ov_camera_module_write_reg(cam_mod,
+//			0x380d,
+//			0xA0);
+//		ret |= ov_camera_module_write_reg(cam_mod,
+//			0x380E,
+//			0x02);
+//		ret |= ov_camera_module_write_reg(cam_mod,
+//			0x380F,
+//			0x04);
+
 		ret = ov_camera_module_write_reg(cam_mod,
 			ov7750_AEC_PK_LONG_EXPO_3RD_REG,
 			ov7750_FETCH_3RD_BYTE_EXP(exp_time));
@@ -443,13 +490,20 @@ static int ov7750_write_aec(struct ov_camera_module *cam_mod)
 		ret |= ov_camera_module_write_reg(cam_mod,
 			ov7750_AEC_PK_LONG_EXPO_1ST_REG,
 			ov7750_FETCH_1ST_BYTE_EXP(exp_time));
+
+		ret |= ov_camera_module_write_reg(cam_mod,
+			0x350b,
+			a_gain);
+
+
+
 		if (cam_mod->state == OV_CAMERA_MODULE_STREAMING) {
-			ret = ov_camera_module_write_reg(cam_mod,
-				ov7750_AEC_GROUP_UPDATE_ADDRESS,
-				ov7750_AEC_GROUP_UPDATE_END_DATA);
-			ret = ov_camera_module_write_reg(cam_mod,
-				ov7750_AEC_GROUP_UPDATE_ADDRESS,
-				ov7750_AEC_GROUP_UPDATE_END_LAUNCH);
+//			ret = ov_camera_module_write_reg(cam_mod,
+//				ov7750_AEC_GROUP_UPDATE_ADDRESS,
+//				ov7750_AEC_GROUP_UPDATE_END_DATA);
+//			ret = ov_camera_module_write_reg(cam_mod,
+//				ov7750_AEC_GROUP_UPDATE_ADDRESS,
+//				ov7750_AEC_GROUP_UPDATE_END_LAUNCH);
 		}
 	}
 
