@@ -681,17 +681,20 @@
 		hp-det-adc-value = <500>;
 	};
 	
-	camera0: camera-module@10 {
+	camera0: camera-module@60 {
 		status = "okay";
-		compatible = "omnivision,ov13850-v4l2-i2c-subdev";
-		reg = < 0x10 >;
+		compatible = "ovti,ov7750-v4l2-i2c-subdev";
+		reg = < 0x60 >;
 		device_type = "v4l2-i2c-subdev";
+
 		clocks = <&cru SCLK_CIF_OUT>;
 		clock-names = "clk_cif_out";
+
 		pinctrl-names = "rockchip,camera_default",
-				"rockchip,camera_sleep";
+			"rockchip,camera_sleep";
 		pinctrl-0 = <&cam0_default_pins>;
 		pinctrl-1 = <&cam0_sleep_pins>;
+
 		rockchip,pd-gpio = <&gpio2 12 GPIO_ACTIVE_LOW>;
 		rockchip,pwr-gpio = <&gpio1 23 GPIO_ACTIVE_HIGH>;
 
@@ -700,24 +703,74 @@
 
 		/* mipi switch control */
 		rockchip,rst-gpio = <&gpio0 8 GPIO_ACTIVE_LOW>;
+
 		rockchip,camera-module-mclk-name = "clk_cif_out";
 		rockchip,camera-module-facing = "back";
 		rockchip,camera-module-name = "cmk-cb0695-fv1";
 		rockchip,camera-module-len-name = "lg9569a2";
-		rockchip,camera-module-fov-h = "66.0";
-		rockchip,camera-module-fov-v = "50.1";
+		rockchip,camera-module-fov-h = "133.0";
+		rockchip,camera-module-fov-v = "100.1";
 		rockchip,camera-module-orientation = <0>;
 		rockchip,camera-module-iq-flip = <0>;
 		rockchip,camera-module-iq-mirror = <0>;
-		rockchip,camera-module-flip = <1>;
+		rockchip,camera-module-flip = <0>;
 		rockchip,camera-module-mirror = <0>;
 
-		rockchip,camera-module-defrect0 = <2112 1568 0 0 2112 1568>;
-		rockchip,camera-module-defrect1 = <4224 3136 0 0 4224 3136>;
-		rockchip,camera-module-defrect3 = <3264 2448 0 0 3264 2448>;
+		rockchip,camera-module-defrect0 = <640 480 0 0 640 480>;
+		rockchip,camera-module-defrect1 = <640 480 0 0 640 480>;
+		rockchip,camera-module-defrect2 = <640 480 0 0 640 480>;
+		rockchip,camera-module-defrect3 = <640 480 0 0 640 480>;
 		rockchip,camera-module-flash-support = <0>;
 		rockchip,camera-module-mipi-dphy-index = <0>;
 	};
+
+	lsm6dsm@6a {
+  		compatible = "st,lsm6dsm";
+  		reg = <0x6a>;
+  		interrupt-parent = <&gpio3>;
+  		interrupts = <31 IRQ_TYPE_EDGE_RISING>;
+
+		clocks = <&cru SCLK_CIF_OUT>;
+		clock-names = "clk_cif_out";
+	};
+
+//	camera1: camera-module@10 {
+//		status = "okay";
+//		compatible = "omnivision,ov13850-v4l2-i2c-subdev";
+//		reg = < 0x10 >;
+//		device_type = "v4l2-i2c-subdev";
+//		clocks = <&cru SCLK_CIF_OUT>;
+//		clock-names = "clk_cif_out";
+//		pinctrl-names = "rockchip,camera_default",
+//				"rockchip,camera_sleep";
+//		pinctrl-0 = <&cam0_default_pins>;
+//		pinctrl-1 = <&cam0_sleep_pins>;
+//		rockchip,pd-gpio = <&gpio2 12 GPIO_ACTIVE_LOW>;
+//		rockchip,pwr-gpio = <&gpio1 23 GPIO_ACTIVE_HIGH>;
+//
+//		//hack to get 1.2v up - reusing an existing "torch" GPIO name for other CIF_PWR
+//		rockchip,torch-gpio = <&gpio1 22 GPIO_ACTIVE_HIGH>; 
+//
+//		/* mipi switch control */
+//		rockchip,rst-gpio = <&gpio0 8 GPIO_ACTIVE_LOW>;
+//		rockchip,camera-module-mclk-name = "clk_cif_out";
+//		rockchip,camera-module-facing = "back";
+//		rockchip,camera-module-name = "cmk-cb0695-fv1";
+//		rockchip,camera-module-len-name = "lg9569a2";
+//		rockchip,camera-module-fov-h = "66.0";
+//		rockchip,camera-module-fov-v = "50.1";
+//		rockchip,camera-module-orientation = <0>;
+//		rockchip,camera-module-iq-flip = <0>;
+//		rockchip,camera-module-iq-mirror = <0>;
+//		rockchip,camera-module-flip = <1>;
+//		rockchip,camera-module-mirror = <0>;
+//
+//		rockchip,camera-module-defrect0 = <2112 1568 0 0 2112 1568>;
+//		rockchip,camera-module-defrect1 = <4224 3136 0 0 4224 3136>;
+//		rockchip,camera-module-defrect3 = <3264 2448 0 0 3264 2448>;
+//		rockchip,camera-module-flash-support = <0>;
+//		rockchip,camera-module-mipi-dphy-index = <0>;
+//	};
 
 
 };
@@ -765,13 +818,6 @@
 		orientation-z= <1>;
 		irq-gpio = <&gpio1 4 IRQ_TYPE_LEVEL_LOW>;
 		mpu-debug = <1>;
-	};
-
-	lsm6dsm@6b {
-  		compatible = "st,lsm6dsm";
-  		reg = <0x6b>;
-  		interrupt-parent = <&gpio4>;
-  		interrupts = <29 IRQ_TYPE_EDGE_RISING>;
 	};
 
 };
